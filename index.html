@@ -55,6 +55,7 @@
         <span id="profileNameLabel">Reiskoflix</span>
       </div>
       <button class="switch-btn" id="switchProfileBtn" title="Profil değiştir">Profil Değiştir</button>
+      <button class="poster-btn" id="posterSettingsBtn" title="Gerçek film posterleri">🖼️</button>
     </div>
   </header>
 
@@ -82,7 +83,30 @@
 
   <footer class="site-footer">
     <p>REISKOFLIX — Reiskoflix &amp; Küçük Reisko için özel yapım film merkezi 🎬</p>
+    <p class="tmdb-attribution">Film posterleri etkinleştirildiğinde <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a> tarafından sağlanır. Bu ürün TMDB API kullanır ancak TMDB tarafından onaylanmamıştır.</p>
   </footer>
+</div>
+
+<!-- TMDB POSTER AYAR MODALI -->
+<div class="modal-overlay hidden" id="posterModalOverlay">
+  <div class="modal poster-modal">
+    <button class="modal-close" id="posterModalClose">&times;</button>
+    <div class="modal-body">
+      <h2>🖼️ Gerçek Film Posterleri</h2>
+      <p>Filmlerin gerçek afişlerini ve arka plan görsellerini göstermek için ücretsiz bir <strong>TMDB API anahtarı</strong> gerekir. Sadece bu tarayıcıda saklanır, kimseyle paylaşılmaz.</p>
+      <ol class="poster-steps">
+        <li><a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">themoviedb.org/settings/api</a> adresine git ve ücretsiz hesap oluştur</li>
+        <li>"API Key (v3 auth)" değerini kopyala</li>
+        <li>Aşağıya yapıştır ve kaydet</li>
+      </ol>
+      <div class="key-input-row">
+        <input type="text" id="tmdbKeyInput" placeholder="TMDB API anahtarını yapıştır...">
+        <button class="btn btn-play" id="tmdbKeySave">Kaydet</button>
+      </div>
+      <button class="btn btn-info" id="tmdbKeyRemove">Anahtarı Kaldır</button>
+      <p class="poster-status" id="posterStatusMsg"></p>
+    </div>
+  </div>
 </div>
 
 <!-- FİLM DETAY MODALI -->

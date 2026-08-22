@@ -69,6 +69,7 @@ const MOVIES = [
   {
     id: "mi8",
     title: "Mission: Impossible – The Final Reckoning",
+    tmdbQuery: "Mission Impossible The Final Reckoning",
     year: 2025,
     genre: "Aksiyon",
     rating: 7.6,
@@ -127,6 +128,74 @@ const MOVIES = [
 let currentProfile = null;
 let activeFilter = "all";
 
+// ---------- TMDB gerçek poster entegrasyonu (opsiyonel, kullanıcının kendi ücretsiz API anahtarıyla) ----------
+const TMDB_KEY_STORAGE = "reiskoflix_tmdb_key";
+const TMDB_CACHE_STORAGE = "reiskoflix_tmdb_cache";
+
+function getTmdbKey() {
+  return localStorage.getItem(TMDB_KEY_STORAGE) || "";
+}
+
+function getTmdbCache() {
+  try {
+    return JSON.parse(localStorage.getItem(TMDB_CACHE_STORAGE)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveTmdbCacheEntry(movieId, data) {
+  const cache = getTmdbCache();
+  cache[movieId] = data;
+  localStorage.setItem(TMDB_CACHE_STORAGE, JSON.stringify(cache));
+}
+
+async function fetchTmdbImages(movie) {
+  const cache = getTmdbCache();
+  if (cache[movie.id]) return cache[movie.id];
+
+  const apiKey = getTmdbKey();
+  if (!apiKey) return null;
+
+  const query = encodeURIComponent(movie.tmdbQuery || movie.title);
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}&year=${movie.year}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`TMDB HTTP ${res.status}`);
+    const data = await res.json();
+    const hit = data.results && data.results[0];
+    if (!hit) return null;
+    const result = {
+      poster: hit.poster_path ? `https://image.tmdb.org/t/p/w500${hit.poster_path}` : null,
+      backdrop: hit.backdrop_path ? `https://image.tmdb.org/t/p/w1280${hit.backdrop_path}` : null
+    };
+    saveTmdbCacheEntry(movie.id, result);
+    return result;
+  } catch (err) {
+    console.warn("TMDB fetch başarısız:", movie.title, err);
+    return null;
+  }
+}
+
+function applyPosterToCard(cardEl, posterUrl) {
+  if (!cardEl || !posterUrl) return;
+  const posterBox = cardEl.querySelector(".card-poster");
+  if (!posterBox || posterBox.querySelector(".poster-img")) return;
+  const img = document.createElement("img");
+  img.className = "poster-img";
+  img.loading = "lazy";
+  img.alt = "";
+  img.src = posterUrl;
+  img.onload = () => posterBox.classList.add("has-image");
+  img.onerror = () => img.remove();
+  posterBox.prepend(img);
+}
+
+function updatePosterButtonState() {
+  document.getElementById("posterSettingsBtn").classList.toggle("is-active", !!getTmdbKey());
+}
+
 function watchedKey(profile) {
   return `reiskoflix_watched_${profile}`;
 }
@@ -181,6 +250,7 @@ function enterApp() {
     : "linear-gradient(145deg, #a78bfa, #4c1d95)";
   renderHero();
   renderRows();
+  updatePosterButtonState();
 }
 
 // ---------- Hero ----------
@@ -196,6 +266,20 @@ function renderHero() {
   `;
   document.getElementById("heroPlayBtn").onclick = () => openModal(featured);
   document.getElementById("heroInfoBtn").onclick = () => openModal(featured);
+
+  const cached = getTmdbCache()[featured.id];
+  if (cached && cached.backdrop) {
+    applyHeroBackdrop(cached.backdrop);
+  } else if (getTmdbKey()) {
+    fetchTmdbImages(featured).then(data => {
+      if (data && data.backdrop) applyHeroBackdrop(data.backdrop);
+    });
+  }
+}
+
+function applyHeroBackdrop(backdropUrl) {
+  document.getElementById("heroMedia").style.backgroundImage =
+    `linear-gradient(to right, rgba(10,10,15,0.35), rgba(10,10,15,0.05)), url(${backdropUrl})`;
 }
 
 // ---------- Satırları oluştur ----------
@@ -304,6 +388,15 @@ function buildCard(movie) {
 
   card.addEventListener("click", () => openModal(movie));
 
+  const cached = getTmdbCache()[movie.id];
+  if (cached && cached.poster) {
+    applyPosterToCard(card, cached.poster);
+  } else if (getTmdbKey()) {
+    fetchTmdbImages(movie).then(data => {
+      if (data && data.poster) applyPosterToCard(card, data.poster);
+    });
+  }
+
   return card;
 }
 
@@ -404,4 +497,60 @@ window.addEventListener("scroll", () => {
   } else {
     nav.style.background = "linear-gradient(to bottom, rgba(5,5,8,0.95), rgba(5,5,8,0.4))";
   }
+});
+
+// ---------- TMDB API anahtarı ayar modalı ----------
+const posterModalOverlay = document.getElementById("posterModalOverlay");
+const tmdbKeyInput = document.getElementById("tmdbKeyInput");
+const posterStatusMsg = document.getElementById("posterStatusMsg");
+
+function showPosterStatus(msg, isError) {
+  posterStatusMsg.textContent = msg;
+  posterStatusMsg.className = "poster-status " + (isError ? "err" : "ok");
+}
+
+document.getElementById("posterSettingsBtn").addEventListener("click", () => {
+  tmdbKeyInput.value = getTmdbKey();
+  posterStatusMsg.textContent = "";
+  posterStatusMsg.className = "poster-status";
+  posterModalOverlay.classList.remove("hidden");
+});
+
+document.getElementById("posterModalClose").addEventListener("click", () => {
+  posterModalOverlay.classList.add("hidden");
+});
+posterModalOverlay.addEventListener("click", e => {
+  if (e.target === posterModalOverlay) posterModalOverlay.classList.add("hidden");
+});
+
+document.getElementById("tmdbKeySave").addEventListener("click", async () => {
+  const key = tmdbKeyInput.value.trim();
+  if (!key) {
+    showPosterStatus("Lütfen bir API anahtarı gir.", true);
+    return;
+  }
+  showPosterStatus("Kontrol ediliyor...", false);
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/configuration?api_key=${key}`);
+    if (!res.ok) throw new Error("invalid key");
+    localStorage.setItem(TMDB_KEY_STORAGE, key);
+    localStorage.removeItem(TMDB_CACHE_STORAGE);
+    showPosterStatus("Anahtar kaydedildi! Posterler yükleniyor...", false);
+    updatePosterButtonState();
+    renderHero();
+    renderRows();
+    setTimeout(() => posterModalOverlay.classList.add("hidden"), 900);
+  } catch {
+    showPosterStatus("Anahtar geçersiz görünüyor, lütfen kontrol et.", true);
+  }
+});
+
+document.getElementById("tmdbKeyRemove").addEventListener("click", () => {
+  localStorage.removeItem(TMDB_KEY_STORAGE);
+  localStorage.removeItem(TMDB_CACHE_STORAGE);
+  tmdbKeyInput.value = "";
+  updatePosterButtonState();
+  showPosterStatus("Anahtar kaldırıldı.", false);
+  renderHero();
+  renderRows();
 });

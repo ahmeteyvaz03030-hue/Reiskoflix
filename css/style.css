@@ -231,6 +231,23 @@ html, body {
 }
 .switch-btn:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); }
 
+.poster-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.poster-btn:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); }
+.poster-btn.is-active { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(245,192,96,0.25); }
+
 /* ---------- Hero ---------- */
 .hero {
   position: relative;
@@ -401,7 +418,7 @@ html, body {
 }
 .card:hover .card-poster::after { opacity: 1; }
 
-.card-icon { font-size: 3.2rem; margin-bottom: 0.6rem; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); transform: translateZ(30px); }
+.card-icon { font-size: 3.2rem; margin-bottom: 0.6rem; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); transform: translateZ(30px); transition: opacity 0.25s ease; }
 .card-poster-title {
   font-family: "Bebas Neue", sans-serif;
   font-size: 1.35rem;
@@ -409,8 +426,27 @@ html, body {
   line-height: 1.15;
   transform: translateZ(20px);
   text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  transition: opacity 0.25s ease;
 }
-.card-year { font-size: 0.75rem; opacity: 0.8; margin-top: 0.3rem; transform: translateZ(15px); }
+.card-year { font-size: 0.75rem; opacity: 0.8; margin-top: 0.3rem; transform: translateZ(15px); transition: opacity 0.25s ease; }
+
+.poster-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius);
+  z-index: 0;
+  transform: translateZ(5px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.card-poster.has-image .poster-img { opacity: 1; }
+.card-poster.has-image .card-icon,
+.card-poster.has-image .card-poster-title,
+.card-poster.has-image .card-year { opacity: 0; pointer-events: none; }
+.card-poster.has-image::before { background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0) 45%); }
 
 .card-badge-rating {
   position: absolute;
@@ -572,6 +608,31 @@ html, body {
 }
 .modal-body p { color: var(--text-dim); line-height: 1.7; }
 .modal-actions { margin-top: 1.3rem; }
+
+/* ---------- Poster ayar modalı ---------- */
+.poster-modal { width: min(520px, 100%); }
+.poster-modal .modal-body h2 { font-size: 1.6rem; }
+.poster-modal .modal-body p { font-size: 0.9rem; }
+.poster-steps { color: var(--text-dim); font-size: 0.88rem; line-height: 1.8; padding-left: 1.2rem; }
+.poster-steps a { color: var(--gold); }
+.key-input-row { display: flex; gap: 0.6rem; margin: 1rem 0 0.8rem; }
+.key-input-row input {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+}
+.key-input-row input:focus { border-color: var(--red); }
+.key-input-row .btn { padding: 0.7rem 1.3rem; font-size: 0.9rem; }
+#tmdbKeyRemove { font-size: 0.82rem; padding: 0.55rem 1rem; }
+.poster-status { font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2em; }
+.poster-status.ok { color: #2ecc71; }
+.poster-status.err { color: var(--red-glow); }
 
 /* ---------- Footer ---------- */
 .site-footer {

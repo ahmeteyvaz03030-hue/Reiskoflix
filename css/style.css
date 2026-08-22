@@ -582,6 +582,17 @@ html, body {
   height: 100%;
   border: none;
 }
+.video-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 1rem;
+}
 .modal-body { padding: 1.8rem 2rem 2.2rem; }
 .modal-body h2 { font-family: "Bebas Neue", sans-serif; font-size: 2.1rem; letter-spacing: 0.02em; margin: 0 0 0.6rem; }
 .modal-meta {

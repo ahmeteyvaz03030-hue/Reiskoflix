@@ -384,6 +384,7 @@ html, body {
   will-change: transform;
   box-shadow: 0 10px 25px -10px rgba(0,0,0,0.6);
 }
+.card:hover { z-index: 5; }
 .grid .card { flex: unset; width: 100%; }
 
 .card-poster {
@@ -654,7 +655,7 @@ html, body {
   border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-/* ---------- Responsive ---------- */
+/* ---------- Responsive: tablet ---------- */
 @media (max-width: 860px) {
   .navbar { flex-wrap: wrap; padding: 1rem 1.2rem; gap: 0.8rem; }
   .nav-left { gap: 1.2rem; }
@@ -664,4 +665,67 @@ html, body {
   .row-title, .row-track, .grid { padding-left: 1.2rem; padding-right: 1.2rem; }
   .brand-logo { font-size: 2.8rem; }
   .switch-btn { display: none; }
+}
+
+/* ---------- Responsive: telefon ---------- */
+@media (max-width: 600px) {
+  /* Profil ekranı */
+  .profile-screen { gap: 1.6rem; padding: 1.2rem; }
+  .brand-logo { font-size: 2.4rem; }
+  .profile-title { font-size: 1.3rem; }
+  .profile-grid { gap: 1.6rem; }
+  .avatar { width: 100px; height: 100px; font-size: 2.6rem; border-radius: 14px; }
+
+  /* Navbar: iki net satıra ayrılmış, taşmayan düzen */
+  .navbar { flex-wrap: wrap; padding: 0.7rem 0.9rem; gap: 0.5rem 0; row-gap: 0.5rem; }
+  .nav-left { flex: 1 1 100%; order: 1; flex-wrap: wrap; justify-content: space-between; align-items: center; row-gap: 0.5rem; }
+  .brand-logo.small { font-size: 1.35rem; }
+  .nav-links { order: 2; flex: 1 1 100%; justify-content: center; gap: 1.6rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.08); }
+  .nav-link { font-size: 0.85rem; }
+  .nav-right { flex: 1 1 100%; order: 3; flex-wrap: wrap; justify-content: space-between; align-items: center; row-gap: 0.5rem; }
+  .search-box { flex: 1 1 100%; order: 1; }
+  .search-box input { width: 100%; }
+  .current-profile { order: 2; font-size: 0.82rem; }
+  .poster-btn { order: 3; }
+
+  /* Hero: navbar artık üstüne binmiyor, boyutlar küçültüldü */
+  .hero { height: auto; min-height: 0; margin-top: 0; padding-top: 1.6rem; padding-bottom: 1.8rem; }
+  .hero-content { padding: 0 1.1rem; max-width: 100%; }
+  .hero-tag { font-size: 0.68rem; }
+  .hero-title { font-size: 1.9rem; line-height: 1.1; margin: 0.3rem 0 0.5rem; }
+  .hero-meta { font-size: 0.78rem; gap: 0.5rem; }
+  .hero-desc {
+    font-size: 0.85rem;
+    margin-bottom: 1.1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hero-actions { flex-wrap: wrap; gap: 0.6rem; }
+  .btn { padding: 0.65rem 1.15rem; font-size: 0.88rem; }
+
+  /* Kartlar: telefon ekranında ufak, ekrana 2+ tane sığacak şekilde */
+  .row { margin-bottom: 1.8rem; }
+  .row-title { font-size: 1.05rem; padding: 0 1rem; margin-bottom: 0.7rem; }
+  .row-track { gap: 0.7rem; padding: 0.8rem 1rem 1.2rem; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 0.9rem; padding: 0 1rem 1.5rem; }
+  .card, .row-track .card { flex: 0 0 128px; width: 128px; height: 190px; }
+  .card-icon { font-size: 1.9rem; margin-bottom: 0.3rem; }
+  .card-poster-title { font-size: 0.92rem; }
+  .card-year { font-size: 0.65rem; }
+  .card-badge-rating { font-size: 0.68rem; padding: 0.15rem 0.4rem; }
+  .card-watched-badge { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+  .card-overlay { padding: 0.5rem; }
+  .card-overlay-title { font-size: 0.65rem; }
+  .mini-btn { width: 28px; height: 28px; font-size: 0.85rem; }
+
+  /* Modal: taşmadan tam ekrana yakın */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal { width: 100%; max-height: 92vh; border-radius: 18px 18px 0 0; }
+  .modal-body { padding: 1.3rem 1.2rem 1.8rem; }
+  .modal-body h2 { font-size: 1.5rem; }
+  .poster-modal { width: 100%; }
+
+  .site-footer { padding: 1.5rem 1rem; font-size: 0.78rem; }
 }

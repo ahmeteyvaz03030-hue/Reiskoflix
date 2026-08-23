@@ -170,6 +170,7 @@ const FALLBACK_ITEMS = [
 // ---------- Durum ----------
 let currentProfile = null;
 let activeFilter = "all";
+const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 // ---------- TMDB entegrasyonu: API anahtarı varsa TÜM film & dizi kataloğu ----------
 const TMDB_KEY_STORAGE = "reiskoflix_tmdb_key";
@@ -531,22 +532,28 @@ function buildCard(item) {
     img.src = item.poster;
   }
 
-  // 3D tilt efekti
-  card.addEventListener("mousemove", e => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const rotateX = ((y - cy) / cy) * -10;
-    const rotateY = ((x - cx) / cx) * 10;
-    card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.06,1.06,1.06)`;
-    card.querySelector(".card-poster").style.setProperty("--mx", `${(x / rect.width) * 100}%`);
-    card.querySelector(".card-poster").style.setProperty("--my", `${(y / rect.height) * 100}%`);
-  });
-  card.addEventListener("mouseleave", () => {
-    card.style.transform = "perspective(900px) rotateX(0) rotateY(0) scale3d(1,1,1)";
-  });
+  // 3D tilt efekti (sadece gerçek fare ile, dokunmatik cihazlarda devre dışı)
+  if (supportsHoverTilt) {
+    card.addEventListener("mousemove", e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rotateX = ((y - cy) / cy) * -6;
+      const rotateY = ((x - cx) / cx) * 6;
+      card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04,1.04,1.04)`;
+      card.querySelector(".card-poster").style.setProperty("--mx", `${(x / rect.width) * 100}%`);
+      card.querySelector(".card-poster").style.setProperty("--my", `${(y / rect.height) * 100}%`);
+    });
+    card.addEventListener("mouseenter", () => {
+      card.style.zIndex = "5";
+    });
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "perspective(900px) rotateX(0) rotateY(0) scale3d(1,1,1)";
+      card.style.zIndex = "";
+    });
+  }
 
   card.querySelector(".watch-toggle").addEventListener("click", e => {
     e.stopPropagation();
